@@ -1,0 +1,691 @@
+{
+  "info": {
+    "_postman_id": "7d4c592a-02c8-4d35-b526-f87398da85c7",
+    "name": "GOFOLKS API — проверка проекта",
+    "description": "Коллекция для проверки GOFOLKS API. Перед запуском убедитесь, что сервер, PostgreSQL и MongoDB запущены, а миграции применены. Выполняйте запросы сверху вниз. Регистрация создаёт новых тестовых пользователей. WebSocket-проверка выполняется отдельным WebSocket-запросом в Postman; инструкция находится в README.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "participantToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "username",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "email",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "ExamplePassword123!",
+      "type": "string"
+    },
+    {
+      "key": "participantUsername",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "participantEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "postId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "activityId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "chatId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ticket",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 — Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json();",
+              "pm.test(\"Сервис GOFOLKS отвечает\", function () { pm.expect(data.status).to.eql(\"ok\"); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 — Регистрация основного пользователя",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Создаёт нового тестового пользователя с уникальными username/email и сохраняет JWT в переменную token. При повторном запуске будет создан новый пользователь."
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const stamp = Date.now().toString();",
+              "pm.collectionVariables.set(\"username\", \"gofolks_\" + stamp);",
+              "pm.collectionVariables.set(\"email\", \"gofolks_\" + stamp + \"@example.com\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Регистрация успешна (201)\", function () { pm.response.to.have.status(201); });",
+              "const data = pm.response.json();",
+              "if (data && data.token) pm.collectionVariables.set(\"token\", data.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 — Вход (проверка логина)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Выполняется с учётными данными, созданными запросом регистрации выше. Обновляет переменную token."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Вход успешен\", function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json();",
+              "if (data && data.token) pm.collectionVariables.set(\"token\", data.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 — Профиль текущего пользователя",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/profile"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Профиль доступен с JWT\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 — Профиль без токена (ожидается 401)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/profile"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Без JWT доступ запрещён\", function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 — Список публикаций",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/posts"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Список публикаций доступен\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 — Создать публикацию",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/posts"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"GOFOLKS Postman test\",\n  \"description\": \"Тестовая публикация, созданная коллекцией Postman\",\n  \"location\": \"Алматы\",\n  \"event_date\": null\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Сохраняет ID созданной публикации в переменную postId."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Публикация создана\", function () { pm.response.to.have.status(201); });",
+              "const data = pm.response.json();",
+              "const post = data.post || data;",
+              "if (post && post.id !== undefined) pm.collectionVariables.set(\"postId\", String(post.id));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 — Получить созданную публикацию",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/posts/{{postId}}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Публикация получена\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 — Обновить свою публикацию",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/posts/{{postId}}"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"GOFOLKS Postman test — updated\",\n  \"description\": \"Проверка обновления публикации через Postman\",\n  \"location\": \"Алматы\",\n  \"event_date\": null\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Публикация обновлена\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 — Удалить свою публикацию",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/posts/{{postId}}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Публикация удалена\", function () { pm.response.to.have.status(204); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 — Список мероприятий",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/activities"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Список мероприятий доступен\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 — Создать мероприятие",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/activities"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"GOFOLKS Postman activity\",\n  \"description\": \"Тест мероприятия и участия в чате\",\n  \"location\": \"Алматы\",\n  \"activity_date\": null,\n  \"max_participants\": 4\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Сохраняет activityId и chatId из ответа."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Мероприятие создано\", function () { pm.response.to.have.status(201); });",
+              "const data = pm.response.json();",
+              "const activity = data.activity || data;",
+              "if (activity && activity.id !== undefined) pm.collectionVariables.set(\"activityId\", String(activity.id));",
+              "if (data && data.chat_id) pm.collectionVariables.set(\"chatId\", data.chat_id);",
+              "else if (activity && activity.id !== undefined) pm.collectionVariables.set(\"chatId\", \"activity-\" + activity.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 — Мои мероприятия (создатель)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/activities/mine"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Мои мероприятия доступны\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 — Регистрация участника",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{participantUsername}}\",\n  \"email\": \"{{participantEmail}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Создаёт отдельного пользователя для проверки вступления в мероприятие."
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const stamp = Date.now().toString();",
+              "pm.collectionVariables.set(\"participantUsername\", \"gofolks_join_\" + stamp);",
+              "pm.collectionVariables.set(\"participantEmail\", \"gofolks_join_\" + stamp + \"@example.com\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Участник зарегистрирован\", function () { pm.response.to.have.status(201); });",
+              "const data = pm.response.json();",
+              "if (data && data.token) pm.collectionVariables.set(\"participantToken\", data.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 — Вход участника",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{participantEmail}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Вход участника успешен\", function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json();",
+              "if (data && data.token) pm.collectionVariables.set(\"participantToken\", data.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 — Присоединиться к мероприятию",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{participantToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/activities/{{activityId}}/join"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Запрос на вступление обработан\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 — Мероприятия участника",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{participantToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/activities/mine"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Список мероприятий участника получен\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 — Выйти из мероприятия",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{participantToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/activities/{{activityId}}/leave"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Выход из мероприятия успешен\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 — Получить билет WebSocket",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/chat/ticket"
+        },
+        "description": "Билет одноразовый и действует около 30 секунд. Сразу после запроса используй его в WebSocket-клиенте."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Билет получен\", function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json();",
+              "if (data && data.ticket) pm.collectionVariables.set(\"ticket\", data.ticket);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 — История чата",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/chat/history?chat_id={{chatId}}"
+        },
+        "description": "Запрос от имени создателя мероприятия, который должен состоять в комнате."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"История чата доступна\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
