@@ -145,7 +145,40 @@ Authorization: Bearer YOUR_JWT_TOKEN
 
 JWT выдаётся при регистрации или входе. Используйте токен текущего пользователя. Не публикуйте токены в репозитории и скриншотах.
 
-## Маршруты API
+
+## Все используемые запросы для Postman
+GET http://localhost:8080/api/health
+
+POST http://localhost:8080/api/auth/register
+
+POST http://localhost:8080/api/auth/login
+
+GET http://localhost:8080/api/profile
+
+GET http://localhost:8080/api/posts
+
+POST http://localhost:8080/api/posts
+
+PUT http://localhost:8080/api/posts/(ur ID Post)
+
+DELETE http://localhost:8080/api/posts/(ur ID Post)
+
+GET http://localhost:8080/api/activities
+
+POST http://localhost:8080/api/activities
+
+GET http://localhost:8080/api/activities/mine
+
+POST http://localhost:8080/api/auth/register
+
+POST http://localhost:8080/api/activities/1/join
+
+POST http://localhost:8080/api/activities/1/leave
+
+POST http://localhost:8080/api/chat/ticket
+
+GET http://localhost:8080/api/chat/history?chat_id=activity-1
+
 
 ### Служебный маршрут
 

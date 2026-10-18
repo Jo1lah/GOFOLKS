@@ -74,7 +74,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/api/health"
+          "raw": "http://localhost:8080/api/health"
         }
       },
       "event": [
@@ -102,7 +102,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/auth/register"
+          "raw": "http://localhost:8080/api/auth/register"
         },
         "body": {
           "mode": "raw",
@@ -151,7 +151,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/auth/login"
+          "raw": "http://localhost:8080/api/auth/login"
         },
         "body": {
           "mode": "raw",
@@ -189,7 +189,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/profile"
+          "raw": "http://localhost:8080/api/profile"
         }
       },
       "event": [
@@ -210,7 +210,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/api/profile"
+          "raw": "http://localhost:8080/api/profile"
         }
       },
       "event": [
@@ -231,7 +231,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/api/posts"
+          "raw": "http://localhost:8080/api/posts"
         }
       },
       "event": [
@@ -261,7 +261,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/posts"
+          "raw": "http://localhost:8080/api/posts"
         },
         "body": {
           "mode": "raw",
@@ -295,7 +295,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/api/posts/{{postId}}"
+          "raw": "http://localhost:8080/api/posts/{{postId}}"
         }
       },
       "event": [
@@ -325,7 +325,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/posts/{{postId}}"
+          "raw": "http://localhost:8080/api/posts/{{postId}}"
         },
         "body": {
           "mode": "raw",
@@ -360,7 +360,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/posts/{{postId}}"
+          "raw": "http://localhost:8080/api/posts/{{postId}}"
         }
       },
       "event": [
@@ -381,7 +381,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/api/activities"
+          "raw": "http://localhost:8080/api/activities"
         }
       },
       "event": [
@@ -411,7 +411,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/activities"
+          "raw": "http://localhost:8080/api/activities"
         },
         "body": {
           "mode": "raw",
@@ -452,7 +452,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/activities/mine"
+          "raw": "http://localhost:8080/api/activities/mine"
         }
       },
       "event": [
@@ -478,7 +478,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/auth/register"
+          "raw": "http://localhost:8080/api/auth/register"
         },
         "body": {
           "mode": "raw",
@@ -527,7 +527,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/auth/login"
+          "raw": "http://localhost:8080/api/auth/login"
         },
         "body": {
           "mode": "raw",
@@ -564,7 +564,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/activities/{{activityId}}/join"
+          "raw": "http://localhost:8080/api/activities/{{activityId}}/join"
         }
       },
       "event": [
@@ -590,7 +590,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/activities/mine"
+          "raw": "http://localhost:8080/api/activities/mine"
         }
       },
       "event": [
@@ -616,7 +616,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/activities/{{activityId}}/leave"
+          "raw": "http://localhost:8080/api/activities/{{activityId}}/leave"
         }
       },
       "event": [
@@ -642,7 +642,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/chat/ticket"
+          "raw": "http://localhost:8080/api/chat/ticket"
         },
         "description": "Билет одноразовый и действует около 30 секунд. Сразу после запроса используй его в WebSocket-клиенте."
       },
@@ -671,7 +671,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/chat/history?chat_id={{chatId}}"
+          "raw": "http://localhost:8080/api/chat/history?chat_id={{chatId}}"
         },
         "description": "Запрос от имени создателя мероприятия, который должен состоять в комнате."
       },
